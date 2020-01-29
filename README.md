@@ -10,6 +10,8 @@ Dependencies
 
 sudo python -m pip install paramiko sqlite3
 
+please note that multicapconverter.py was created by [Abdelhafidh Belalia (s77rt)](https://github.com/s77rt/multicapconverter/) and related credits
+
 
 Pre-flight checks
 -----------------
