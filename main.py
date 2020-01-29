@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 ###############################
-# pwnbase - fetch new peers handshake captures from pwnagotchi 
+# pwnbase - the smart way to manage wpa handshakes collected by pwnagotchi
+#
+# v0.0.1 - 29.01.2020 - First commit
+#
+#
 #
 # https://github.com/michelep/pwnbase
 # 
@@ -8,7 +12,9 @@
 import paramiko
 import sqlite3
 import os
+import sys
 import subprocess
+import argparse
 
 # <-- CONFIGURATION VALUES
 hostname = '10.10.0.2'
@@ -73,6 +79,13 @@ def db_addpeer(filename,fsize):
 
 # MAIN()
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='pwnbase - the smart way to manage wpa handshakes collected by pwnagotchi')
+    parser.add_argument('-r','--rescan', help='Rescan local handshake repository',required=False)
+    parser.add_argument('-i','--ip', help='Pwnagotchi IP (default: %s)'%hostname,required=False)
+    parser.add_argument('-p','--port', help='Pwnagotchi port (default: %d)'%port,required=False)
+
+    args = parser.parse_args()
+
     DB = db_init()
     try:
 	paramiko.util.log_to_file('paramiko.log')
@@ -80,10 +93,9 @@ if __name__ == "__main__":
 	s.load_system_host_keys()
 	s.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 	s.connect(hostname, port, username, password)
-
     except Exception as e:
 	print('An error occurred connecting to Pwnagotchi via SSH: %s: %s' % (e.__class__, e))
-	pass
+	sys.exit(-1)
 
     sftp = s.open_sftp()
     sftp.chdir(hshakes_r_path)

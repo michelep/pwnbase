@@ -3,7 +3,9 @@ pwnbase
 
 Inspired by the great work by CyrisXD and his Pwnagetty, i decide to make a Python script to simplify my life managing captured handshaked.
 
-So, just plug your [Pwnagotchy](https://pwnagotchi.ai) (anche make sure it will be reachable by the net!) and run the "main.py" script ;-)
+So, just plug your [Pwnagotchy](https://pwnagotchi.ai) via USB data port and run the "main.py" script: pwnbase checks for new handshakes, save them and prepare for hashcat. Simply, isn't?
+
+![Raspberry Pi W zero](/assets/rpiw.jpg)
 
 Dependencies
 ------------
@@ -29,5 +31,12 @@ hshakes_l_path = './handshakes/'
 db_path = 'handshakes.db'
 # -->
 ```
+
+
+-----------------
+
+
+Disclaimer
+-----------------
 
 Please note that the use of this code is under your OWN RESPONSABILITY.
