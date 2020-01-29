@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 ###############################
 # pwnbase - fetch new peers handshake captures from pwnagotchi 
+#
+# https://github.com/michelep/pwnbase
 # 
 # by O-Zone <o-zone@zerozone.it>
 import paramiko
 import sqlite3
 import os
+import subprocess
 
 # <-- CONFIGURATION VALUES
-hostname = '10.0.0.2'
+hostname = '10.10.0.2'
 port = 22
 username = 'pi'
 password = 'raspberry'
@@ -92,7 +95,14 @@ if __name__ == "__main__":
 	    if sftp_copy(f.filename):
 		# After successfull copy, add to DB
 		db_addpeer(f.filename,f.st_size)
-		# Convert to HCCAPX
-		os.system('./multicapconverter.py --input handshakes/%s --export hccapx'%(f.filename))
+		# Convert to HCCAPX using multicapconverter (https://github.com/s77rt/multicapconverter)
+		try:
+		    status = subprocess.call('./multicapconverter.py --input handshakes/%s --export hccapx'%(f.filename), shell=True)
+		    if status < 0:
+    			print "Child was terminated by signal", -status
+		    else:
+		        print "Child returned", status
+		except OSError as e:
+		        print "Execution failed:", e
 
     s.close()
