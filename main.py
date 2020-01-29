@@ -2,9 +2,11 @@
 ###############################
 # pwnbase - the smart way to manage wpa handshakes collected by pwnagotchi
 #
-# v0.0.1 - 29.01.2020 - First commit
+# v0.0.1 - 29.01.2020 
+# * First commit
 #
-#
+# v0.0.2 - 29.01.2020
+# * Some minor changes committed
 #
 # https://github.com/michelep/pwnbase
 # 
@@ -80,11 +82,15 @@ def db_addpeer(filename,fsize):
 # MAIN()
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='pwnbase - the smart way to manage wpa handshakes collected by pwnagotchi')
-    parser.add_argument('-r','--rescan', help='Rescan local handshake repository',required=False)
     parser.add_argument('-i','--ip', help='Pwnagotchi IP (default: %s)'%hostname,required=False)
     parser.add_argument('-p','--port', help='Pwnagotchi port (default: %d)'%port,required=False)
 
     args = parser.parse_args()
+
+    if args.ip:
+	hostname = args.ip
+    if args.port:
+	port = args.port
 
     DB = db_init()
     try:
