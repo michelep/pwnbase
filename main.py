@@ -10,6 +10,8 @@
 #
 # v0.0.3 - 25.04.2020
 # * Fixed an error on duplicate peer
+# * Added remove option
+# * Added log option
 #
 # https://github.com/michelep/pwnbase
 # 
@@ -95,6 +97,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='pwnbase - the smart way to manage wpa handshakes collected by pwnagotchi')
     parser.add_argument('-i','--ip', help='Pwnagotchi IP (default: %s)'%hostname,required=False)
     parser.add_argument('-p','--port', help='Pwnagotchi port (default: %d)'%port,required=False)
+    parser.add_argument('-r','--remove', help='Remove peer files after download', action='store_true')
+    parser.add_argument('-l','--log', help='Enable paramiko log (useful for debugging)', action='store_true')
 
     args = parser.parse_args()
 
@@ -105,7 +109,9 @@ if __name__ == "__main__":
 
     DB = db_init()
     try:
-	paramiko.util.log_to_file('paramiko.log')
+	if args.log:
+	    paramiko.util.log_to_file('paramiko.log')
+	
 	s = paramiko.SSHClient()
 	s.load_system_host_keys()
 	s.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -124,6 +130,14 @@ if __name__ == "__main__":
 	    if sftp_copy(f.filename):
 		# After successfull copy, add to DB
 		db_addpeer(f.filename,f.st_size)
+		# Remove downloaded peer files?
+		if args.remove:
+		    try:
+			sftp.remove(f.filename)
+			print("REMOVED")
+		    except Exception as e:
+			print("Failed removing %s: %s %s"%(f.filename,e.__class__,e))
+		    
 		# Convert to HCCAPX using multicapconverter (https://github.com/s77rt/multicapconverter)
 		try:
 		    status = subprocess.call('./multicapconverter.py --quiet --input handshakes/%s --export hccapx'%(f.filename), shell=True)
