@@ -8,6 +8,9 @@
 # v0.0.2 - 29.01.2020
 # * Some minor changes committed
 #
+# v0.0.3 - 25.04.2020
+# * Fixed an error on duplicate peer
+#
 # https://github.com/michelep/pwnbase
 # 
 # by O-Zone <o-zone@zerozone.it>
@@ -71,12 +74,20 @@ def db_checkpeer(filename,fsize):
 		return False
     return True
 
-# Add peer to DB
+# Add or update peer on DB
 def db_addpeer(filename,fsize):
     cur = DB.cursor()
-    result = cur.execute("INSERT INTO peers(filename,size,addate) VALUES('%s','%d',date('now'));"%(filename,fsize))
-    print cur.lastrowid
-    DB.commit()
+    result = cur.execute("UPDATE peers SET size='%d',chgdate=date('now') WHERE filename='%s';"%(fsize,filename))
+    if result:
+	return True
+    # add new...
+    try:
+	result = cur.execute("INSERT INTO peers(filename,size,addate) VALUES('%s','%d',date('now'));"%(filename,fsize))
+	print cur.lastrowid
+	DB.commit()
+    except Exception as e:
+	print('INSERT new peer failed with error: %s: %s' % (e.__class__, e))
+	return False
     return True
 
 # MAIN()
@@ -115,7 +126,7 @@ if __name__ == "__main__":
 		db_addpeer(f.filename,f.st_size)
 		# Convert to HCCAPX using multicapconverter (https://github.com/s77rt/multicapconverter)
 		try:
-		    status = subprocess.call('./multicapconverter.py --input handshakes/%s --export hccapx'%(f.filename), shell=True)
+		    status = subprocess.call('./multicapconverter.py --quiet --input handshakes/%s --export hccapx'%(f.filename), shell=True)
 		    if status < 0:
     			print "Child was terminated by signal", -status
 		    else:
