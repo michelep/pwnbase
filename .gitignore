@@ -1,1 +1,4 @@
 /handshakes/*
+*.hccapx
+*.db
+*.log
